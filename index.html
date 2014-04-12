@@ -99,20 +99,22 @@
 
 					<section>
 						<pre><code data-trim contenteditable>
-	function linkify( selector ) {
-	  if( supports3DTransforms ) {
+var Cylon = require('cylon');
 
-	    var nodes = document.querySelectorAll( selector );
+Cylon.robot({
+  connection: { 
+  	name: 'arduino', 
+  	adaptor: 'firmata', 
+  	port: '/dev/ttyACM0' },
+  device: {
+  	name: 'led', 
+  	driver: 'led', 
+  	pin: 13},
 
-	    for( var i = 0, len = nodes.length; i &lt; len; i++ ) {
-	      var node = nodes[i];
-
-	      if( !node.className ) {
-	        node.className += ' roll';
-	      }
-	    }
-	  }
-	}
+  work: function(my) {
+    every((1).second(), my.led.toggle);
+  }
+}).start();
 						</code></pre>
 					</section>
 
@@ -138,8 +140,31 @@
 				</section>
 
 				<section>
-					<h2>Test-Driven Robotics</h2>
-				</section>
+					<section>
+						<h2>Test-Driven Robotics</h2>
+					</section>
+
+					<section>
+						<pre><code data-trim contenteditable>
+describe("robot", function () {
+  var robot = Cylon.findRobot("testor");
+
+  it("should have work", function () {
+    return robot.work.should.be.a('function');
+  });
+
+  it("should toggle the led after 1 second", 
+    function (done) {
+      var led = robot.devices['led'];
+      var toggle = sinon.stub(led, 'toggle');
+      clock.tick((1).second());
+      toggle.should.have.been.called;
+      done();
+  });
+});
+						</code></pre>
+					</section>
+        </section>
 
 				<section>
 					<h2>Documentation &amp; Support</h2>
